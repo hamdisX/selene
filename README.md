@@ -42,17 +42,18 @@ Tu vois autour de toi des activités sportives publiées par d'autres utilisateu
 
 ## Stack technique
 
-| Couche | Technologie |
-|--------|-------------|
-| Mobile | React Native (Expo) |
-| Backend | Node.js / NestJS |
-| Base de données | PostgreSQL + PostGIS |
-| Cache & temps réel | Redis + WebSocket |
-| Maps | Mapbox |
-| Auth | OTP + JWT + Biométrie |
-| Push notifications | FCM + APNs |
-| Storage | AWS S3 |
-| Infra | AWS (ECS / RDS / ElastiCache) |
+| Couche | Technologie | Notes |
+|--------|-------------|-------|
+| Mobile | Flutter 3.44.0 (Dart) | iOS + Android |
+| Backend | NestJS + Fastify adapter | TypeScript, Node.js 24 LTS |
+| Base de données | PostgreSQL 18 + PostGIS 3.6 | Géospatial natif |
+| Cache & temps réel | Redis 8.6 + Socket.io | Sessions, chat live |
+| Cartes | MapLibre + Mapbox (parallèle) | Free tier 50K loads/mois |
+| Routing/Isochrones | OSRM (dev) → Mapbox (prod) | Temps de trajet |
+| Auth | OTP + JWT RS256 + Biométrie | Flutter Secure Storage |
+| Push notifications | FCM + APNs | Gratuits |
+| Stockage | MinIO (dev) → Cloudflare R2 (prod) | Zone EU, buckets privés |
+| Containerisation | Docker Compose | Dev local |
 
 ---
 
@@ -62,18 +63,29 @@ Tu vois autour de toi des activités sportives publiées par d'autres utilisateu
 selene/
 ├── .claude/
 │   └── agents/
-│       ├── architect-tech-1.md    # Backend / DB / temps réel / géoloc
-│       ├── architect-tech-2.md    # Mobile / Maps / frontend / push
-│       ├── expert-ux.md           # Parcours utilisateur / UX mobile
-│       ├── expert-business.md     # Modèle économique / roadmap
-│       ├── expert-security.md     # RGPD / modération / anti-fake
-│       └── expert-pro.md          # Validation finale globale
+│       ├── cdc/                   # Agents review documents produit
+│       │   ├── architect-tech-1.md
+│       │   ├── architect-tech-2.md
+│       │   ├── expert-ux.md
+│       │   ├── expert-business.md
+│       │   ├── expert-security.md
+│       │   └── expert-pro.md
+│       └── dev/                   # Agents review code
+│           ├── review-backend.md
+│           ├── review-mobile.md
+│           ├── review-database.md
+│           ├── review-infra.md
+│           ├── review-security.md
+│           ├── review-test.md
+│           ├── review-api.md
+│           └── review-pro.md
+├── backend/                       # NestJS + Fastify
+├── mobile/                        # Flutter 3.44.0
 ├── docs/
-│   ├── selene-cdc-v1-initial.md
-│   ├── selene-cdc-v2-post-architects.md
-│   ├── selene-cdc-v3-post-experts.md
-│   └── selene-cdc-v4-final.md
-├── CLAUDE.md
+│   ├── selene-cdc-v4-final.md     # CDC validé (6 agents)
+│   └── TECHNICAL_DECISIONS.md    # Décisions techniques validées (4 agents)
+├── CHANGELOG.md                   # Historique sessions + features
+├── CLAUDE.md                      # Mémoire technique projet
 └── README.md
 ```
 
@@ -81,35 +93,35 @@ selene/
 
 ## Cahier des charges
 
-Le CDC complet est produit via un workflow multi-agents Claude Code :
+Produit via un workflow multi-agents Claude Code (6 agents, 4 phases) :
 
 ```
 Main Agent → v1
-  → Architect-Tech-1 (backend/infra)   ┐ Phase 1
-  → Architect-Tech-2 (mobile/maps)     ┘ consensus à 3 requis
-  → Expert-UX (parcours/écrans)        ┐
-  → Expert-Business (modèle éco)       │ Phase 2
-  → Expert-Security (RGPD/modération)  ┘ 3 OK simultanés requis
-  → Expert-Pro (validation finale)       Phase 3
+  → architect-tech-1 (backend/infra)   ┐ Phase 1
+  → architect-tech-2 (mobile/maps)     ┘ consensus à 3 requis
+  → expert-ux (parcours/écrans)        ┐
+  → expert-business (modèle éco)       │ Phase 2
+  → expert-security (RGPD/modération)  ┘ 3 OK simultanés requis
+  → expert-pro (validation finale)       Phase 3
 ```
 
-Versioning automatique à chaque phase — voir `docs/`.
+Résultat : `docs/selene-cdc-v4-final.md` — EXPERT_PRO_OK ✅
 
 ---
 
 ## Roadmap
 
 ### MVP (Sprint 1–6)
-- [ ] Authentification invité + compte complet
-- [ ] Carte interactive + publication d'activité
+- [ ] Authentification invité + compte complet (OTP + JWT)
+- [ ] Carte interactive + publication d'activité (PostGIS + MapLibre/Mapbox)
 - [ ] Système de demande / acceptation / refus
-- [ ] Chat post-match
-- [ ] Notifications push
-- [ ] Filtres de base
+- [ ] Chat post-match (Socket.io temps réel)
+- [ ] Notifications push (FCM + APNs)
+- [ ] Filtres de base (sport, distance, temps de trajet)
 
 ### V2
 - [ ] Événements sportifs & groupes
-- [ ] Recommandations IA (matching par habitudes)
+- [ ] Recommandations IA (matching par habitudes sportives)
 - [ ] Gamification complète (badges, score, leaderboard)
 - [ ] Modèle premium + publicité locale sportive
 - [ ] Partenariats salles de sport
@@ -128,17 +140,40 @@ Versioning automatique à chaque phase — voir `docs/`.
 ## Sécurité & conformité
 
 - RGPD — consentement explicite, droit à l'oubli, données minimales
-- Géolocalisation — zone approximative uniquement en mode invité
-- Anti-fake — vérification OTP, détection comportements suspects
-- Modération — système de report, blocage, équipe dédiée
-- Chiffrement — bout en bout sur le chat, HTTPS partout
+- Géolocalisation — foreground only, zone approximative en mode invité
+- Anti-fake — vérification OTP, Trust Score, device fingerprinting
+- Modération — système de report, blocage, SLA défini
+- JWT RS256 — access token 15 min, refresh token 7 jours, blacklist Redis
+- Buckets privés — URLs pré-signées, zone EU (Cloudflare R2)
+
+---
+
+## Développement avec Claude Code
+
+### Démarrage de session
+
+À chaque nouvelle session ou après `/clear` :
+
+```
+@CHANGELOG.md @docs/TECHNICAL_DECISIONS.md
+
+[ta tâche ici]
+```
+
+### Agents disponibles
+
+**Agents CDC** (`.claude/agents/cdc/`) — review de documents produit
+**Agents Dev** (`.claude/agents/dev/`) — review de code
+
+Voir `CLAUDE.md` pour les workflows complets.
 
 ---
 
 ## Nom & identité
 
-**Séléné** — déesse grecque de la Lune.  
-Symbole de présence, de lumière locale, de cycles et de rencontres nocturnes comme diurnes. Cohérent avec une app de géolocalisation qui illumine l'activité sportive autour de soi.
+**Séléné** — déesse grecque de la Lune.
+Symbole de présence, de lumière locale, de cycles et de rencontres sportives.
+Cohérent avec une app de géolocalisation qui illumine l'activité sportive autour de soi.
 
 ---
 
