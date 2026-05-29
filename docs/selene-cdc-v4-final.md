@@ -6,9 +6,9 @@
 | Champ            | Valeur                                                  |
 |------------------|---------------------------------------------------------|
 | **Produit**      | Séléné                                                  |
-| **Version**      | 2.1 — Post-Review Experts (UX + Business + Security)   |
+| **Version**      | 4.0 — Final                                             |
 | **Date**         | 29 mai 2026                                             |
-| **Statut**       | Draft corrigé — Resoumission Experts                    |
+| **Statut**       | Validé — EXPERT_PRO_OK                                  |
 | **Confidentialité** | Confidentiel — Usage interne                         |
 | **Auteur**       | Équipe Produit Séléné                                   |
 
@@ -1916,6 +1916,6 @@ Avec 250 000 € et un burn rate de 23 550 €/mois (M6) :
 
 ---
 
-*Document version 2.1 — Corrections post-review Expert-UX + Expert-Business + Expert-Security*
+*Document version 4.0 — Final*
 *Date : 29 mai 2026*
-*Prochaine étape : Resoumission simultanée aux 3 experts pour validation*
+*Validé par : Architect-Tech-1 ✅ · Architect-Tech-2 ✅ · Expert-UX ✅ · Expert-Business ✅ · Expert-Security ✅ · Expert-Pro ✅*
