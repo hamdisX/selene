@@ -19,9 +19,9 @@
 | Mobile test | iPhone (iOS) + Android |
 | Containerisation | Docker Compose |
 | Langue du code | TypeScript (backend) + Dart (mobile) |
-| Flutter version | 3.22+ (Impeller engine, null safety strict) |
-| Node.js version | 20 LTS (requis pour NestJS + Fastify adapter) |
-| PostgreSQL version | 15 + PostGIS 3.4 |
+| Flutter version | 3.44.0 (Impeller engine, null safety strict) |
+| Node.js version | 24 LTS (requis pour NestJS + Fastify adapter) |
+| PostgreSQL version | 18.4 + PostGIS 3.6.3 |
 
 ---
 
@@ -77,7 +77,7 @@ const app = await NestFactory.create(AppModule, new FastifyAdapter());
 - Excellent support MapLibre + Mapbox
 
 **Configuration :**
-- Flutter version : 3.22+ (Impeller engine activé par défaut)
+- Flutter version : 3.44.0 (Impeller engine activé par défaut)
 - iOS → Simulateur Xcode ou iPhone physique
 - Android → Émulateur Android Studio ou téléphone physique
 - Backend accessible via `http://localhost:3000` (physique iOS) ou `http://10.0.2.2:3000` (émulateur Android)
@@ -108,7 +108,7 @@ flutter run --flavor staging --dart-define=APP_ENV=staging --dart-define=MAP_DRI
 
 ### 2.3 Base de données
 
-**Choix : PostgreSQL 15 + PostGIS + Redis**
+**Choix : PostgreSQL 18.4 + PostGIS 3.6.3 + Redis 8.6.3**
 
 **Architecture : Une seule base partagée**
 
@@ -658,7 +658,7 @@ selene/
 │   ├── .env.staging
 │   ├── .env.example               # Variables requises (valeurs vides)
 │   └── docker-compose.yml
-├── mobile/                        # Flutter 3.22+
+├── mobile/                        # Flutter 3.44.0
 │   ├── lib/
 │   │   ├── features/
 │   │   │   ├── auth/
@@ -720,7 +720,7 @@ messages               (id, room_id, sender_id, content, created_at)
 
 ### Mobile (Flutter)
 - Architecture : Feature-first (un dossier par feature)
-- Version Flutter : 3.22+ avec null safety strict
+- Version Flutter : 3.44.0 avec null safety strict
 - State management : Riverpod avec code generation (`@riverpod` annotation)
 - Navigation : GoRouter (routing déclaratif, deep links, auth redirects)
 - Appels API : Dio + intercepteurs (auth token, refresh automatique, erreurs)
