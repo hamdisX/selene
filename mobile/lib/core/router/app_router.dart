@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../config/app_config.dart';
 import '../providers/auth_state_provider.dart';
 import '../../features/auth/presentation/auth_screen.dart';
+import '../../features/auth/presentation/otp_screen.dart';
+import '../../features/auth/presentation/guest_screen.dart';
 import '../../features/map/presentation/map_screen.dart';
 import '../../features/activities/presentation/activities_screen.dart';
 import '../../features/matching/presentation/matching_screen.dart';
@@ -10,25 +13,42 @@ import '../../features/chat/presentation/chat_screen.dart';
 
 part 'app_router.g.dart';
 
-const _routesPubliques = ['/auth', '/splash'];
-
 @Riverpod(keepAlive: true)
 GoRouter appRouter(AppRouterRef ref) {
-  // Guard actif dès Sprint 0 : authStateProvider retourne false (stub)
-  // → toutes les routes protégées redirigent vers /auth jusqu'au Sprint Auth
-  final isAuthenticated = ref.watch(authStateProvider);
+  // ValueNotifier<void> déclenche le refresh du GoRouter quand authState change.
+  // ref.listen rebranché à chaque rebuild du provider (keepAlive = pas de rebuild).
+  final routerListenable = ValueNotifier<void>(null);
+  ref.onDispose(routerListenable.dispose);
+  ref.listen<AuthCurrentUser?>(authStateProvider, (_, __) {
+    routerListenable.notifyListeners();
+  });
 
   return GoRouter(
     initialLocation: '/splash',
     debugLogDiagnostics: isDevelopment,
+    refreshListenable: routerListenable,
     redirect: (context, state) {
-      final versRoutePublique = _routesPubliques.any(
-        (r) => state.matchedLocation.startsWith(r),
-      );
-      if (!isAuthenticated && !versRoutePublique) return '/auth';
-      if (isAuthenticated && state.matchedLocation.startsWith('/auth')) {
-        return '/map';
+      // ref.read (pas ref.watch) dans redirect — GoRouter n'est pas un widget
+      final authUser = ref.read(authStateProvider);
+      final loc = state.matchedLocation;
+      final isGuestRoute = loc == '/auth/guest';
+      final isAuthRoute = loc.startsWith('/auth') || loc == '/splash';
+
+      // Non authentifié
+      if (authUser == null) {
+        if (isGuestRoute) return '/auth';
+        if (!isAuthRoute) return '/auth';
+        return null;
       }
+
+      // Authentifié mais profil incomplet → forcer la configuration invité
+      if (!authUser.isProfileComplete) {
+        if (!isGuestRoute) return '/auth/guest';
+        return null;
+      }
+
+      // Authentifié et complet → interdire toutes les routes auth
+      if (isAuthRoute) return '/map';
       return null;
     },
     routes: [
@@ -46,7 +66,13 @@ GoRouter appRouter(AppRouterRef ref) {
           ),
           GoRoute(
             path: 'otp',
-            builder: (context, state) => const AuthOtpScreen(),
+            builder: (context, state) => AuthOtpScreen(
+              phone: state.extra as String? ?? '',
+            ),
+          ),
+          GoRoute(
+            path: 'guest',
+            builder: (context, state) => const GuestScreen(),
           ),
         ],
       ),
@@ -58,7 +84,6 @@ GoRouter appRouter(AppRouterRef ref) {
         path: '/activities',
         builder: (context, state) => const ActivitiesScreen(),
         routes: [
-          // Routes statiques AVANT les routes dynamiques (règle GoRouter)
           GoRoute(
             path: 'create',
             builder: (context, state) => const CreateActivityScreen(),

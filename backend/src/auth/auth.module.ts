@@ -3,6 +3,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
+import { UsersModule } from '../users/users.module';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -14,10 +19,14 @@ import * as fs from 'fs';
         const publicPath = config.getOrThrow<string>('JWT_PUBLIC_KEY_PATH');
 
         if (!fs.existsSync(privatePath)) {
-          throw new Error(`AuthModule: clé privée JWT introuvable : ${privatePath}. Générer les clés avec scripts/generate-jwt-keys.sh`);
+          throw new Error(
+            `AuthModule: clé privée JWT introuvable : ${privatePath}. Générer les clés avec scripts/generate-jwt-keys.sh`,
+          );
         }
         if (!fs.existsSync(publicPath)) {
-          throw new Error(`AuthModule: clé publique JWT introuvable : ${publicPath}. Générer les clés avec scripts/generate-jwt-keys.sh`);
+          throw new Error(
+            `AuthModule: clé publique JWT introuvable : ${publicPath}. Générer les clés avec scripts/generate-jwt-keys.sh`,
+          );
         }
 
         return {
@@ -27,10 +36,16 @@ import * as fs from 'fs';
             algorithm: 'RS256',
             expiresIn: config.getOrThrow<number>('JWT_ACCESS_EXPIRES_IN'),
           },
+          verifyOptions: {
+            algorithms: ['RS256'],
+          },
         };
       },
     }),
+    UsersModule,
   ],
-  exports: [JwtModule, PassportModule],
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard],
+  exports: [JwtModule, PassportModule, JwtAuthGuard],
 })
 export class AuthModule {}

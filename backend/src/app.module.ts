@@ -13,6 +13,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { GeoModule } from './geo/geo.module';
 import { ModerationModule } from './moderation/moderation.module';
 import { AdaptersModule } from './adapters/adapters.module';
+import { RedisModule } from './redis/redis.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -49,6 +50,7 @@ import { HealthController } from './health.controller';
     ]),
 
     // Modules métier
+    RedisModule,
     AdaptersModule,
     AuthModule,
     UsersModule,

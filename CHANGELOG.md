@@ -270,6 +270,72 @@ Erreurs détectées après clonage du repo sur une nouvelle machine Ubuntu + `fl
 
 ---
 
+## [2026-05-31] — Sprint 1 : Module Auth complet
+
+### Ajouté — Backend (NestJS)
+
+- `backend/src/redis/redis.module.ts` — @Global, REDIS_CLIENT token, listener error, RedisShutdownService (onModuleDestroy)
+- `backend/src/users/entities/user.entity.ts` — TypeORM entity, types explicites, null-safe avec `!`
+- `backend/src/users/entities/push-token.entity.ts` — TypeORM entity, FK cascade
+- `backend/src/users/users.service.ts` — findByPhone, findById, createFromPhone, updateGuestProfile (transaction + ConflictException générique)
+- `backend/src/auth/dto/` — 5 DTOs (SendOtp, VerifyOtp, RefreshToken, SetupGuest, Logout) avec `!` strict + E.164 via @Matches
+- `backend/src/auth/strategies/jwt.strategy.ts` — RS256, vérifie type==='access' + blacklist JTI Redis
+- `backend/src/auth/guards/jwt-auth.guard.ts` — extends AuthGuard('jwt')
+- `backend/src/auth/auth.service.ts` — OTP rate limiting Redis (3/10min), lockout (15min), JWT RS256, rotation refresh (blacklist ancien JTI), logout blacklist
+- `backend/src/auth/auth.controller.ts` — 5 endpoints : POST /auth/phone, /auth/verify, /auth/guest, /auth/refresh, /auth/logout
+
+### Ajouté — Base de données
+
+- `backend/src/migrations/1748700000000-CreateUsers.ts` — tables users + push_tokens, CHECK genre/platform, FK cascade
+- `backend/src/migrations/1748700001000-RemoveRedundantPhoneIndex.ts` — suppression IDX_users_phone (doublon de UQ_users_phone)
+- Migrations exécutées avec succès sur PostgreSQL 18.4 ✅
+
+### Ajouté — Mobile (Flutter)
+
+- `mobile/lib/core/providers/auth_state_provider.dart` — AuthCurrentUser, fromAccessToken (null-safe), AuthState NotifierProvider keepAlive, logout try/finally avec révocation serveur
+- `mobile/lib/features/auth/data/auth_repository.dart` — sendOtp, verifyOtp (null-check response.data), setupGuest, logout
+- `mobile/lib/features/auth/providers/auth_provider.dart` — authRepositoryProvider AutoDisposeProvider
+- `mobile/lib/features/auth/presentation/auth_screen.dart` — formulaire téléphone E.164, validation
+- `mobile/lib/features/auth/presentation/otp_screen.dart` — saisie 6 chiffres, resend OTP
+- `mobile/lib/features/auth/presentation/guest_screen.dart` — pseudo/age slider/genre segmented
+- `mobile/lib/core/router/app_router.dart` — refreshListenable + ref.listen + ref.read dans redirect, 3 états : non-auth / profil-incomplet / complet
+
+### Modifié
+
+- `backend/src/auth/auth.module.ts` — AuthService, AuthController, JwtStrategy, JwtAuthGuard, UsersModule
+- `backend/src/app.module.ts` — ajout RedisModule
+- `backend/src/users/users.module.ts` — TypeOrmModule.forFeature([User, PushToken]), exports UsersService
+
+### Validé (Workflow C × 2 cycles)
+
+- REVIEW_BACKEND_OK ✅
+- REVIEW_MOBILE_OK ✅
+- REVIEW_DATABASE_OK ✅
+- REVIEW_API_OK ✅
+- REVIEW_SECURITY_OK ✅
+- REVIEW_TEST_OK ✅
+- **REVIEW_PRO_OK ✅** — Verdict : APPROUVÉ AVEC RÉSERVES MINEURES
+
+### Tests e2e validés
+
+| Endpoint | Résultat |
+|----------|----------|
+| POST /auth/phone (+33749414611) | 204 ✅ |
+| POST /auth/verify | 200 + JWT RS256 + is_new_user:true ✅ |
+| POST /auth/guest (HamdiS, 30, homme) | 204 ✅ |
+| POST /auth/refresh | 200 + rotation tokens ✅ |
+| POST /auth/logout | 204 + JTI blacklisté Redis ✅ |
+
+### Points de vigilance documentés (backlog Sprint 2)
+
+- `logout()` backend utilise `jwtService.verifyAsync` (correct — signature vérifiée)
+- Phone stocké en clair en DB (risque accepté Sprint 1, à hacher Sprint 2)
+- OTP non atomique DB (probabilité négligeable en dev, transaction Sprint 2)
+- Gestion 429 dans Flutter AuthInterceptor (UX Sprint 2)
+- Tests unitaires auth.service.spec.ts + jwt.strategy.spec.ts à écrire Sprint 2
+
+---
+
 <!-- TEMPLATE pour les prochaines entrées
 
 ## [YYYY-MM-DD] — Sprint N / Feature X

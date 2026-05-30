@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { PushToken } from './entities/push-token.entity';
+import { UsersService } from './users.service';
 
 @Module({
-  imports: [],
-  providers: [],
-  exports: [],
+  imports: [TypeOrmModule.forFeature([User, PushToken])],
+  providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
