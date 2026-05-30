@@ -124,7 +124,7 @@ class _AuthPhoneScreenState extends ConsumerState<AuthPhoneScreen> {
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Numéro requis';
                     if (!RegExp(r'^\+\d{8,15}$').hasMatch(v.trim())) {
-                      return 'Format invalide — ex. : +33749414611';
+                      return 'Format invalide — ex. : +33612345678';
                     }
                     return null;
                   },

@@ -320,7 +320,7 @@ Erreurs détectées après clonage du repo sur une nouvelle machine Ubuntu + `fl
 
 | Endpoint | Résultat |
 |----------|----------|
-| POST /auth/phone (+33749414611) | 204 ✅ |
+| POST /auth/phone (+33612345678) | 204 ✅ |
 | POST /auth/verify | 200 + JWT RS256 + is_new_user:true ✅ |
 | POST /auth/guest (HamdiS, 30, homme) | 204 ✅ |
 | POST /auth/refresh | 200 + rotation tokens ✅ |
