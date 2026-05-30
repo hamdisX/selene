@@ -1,105 +1,86 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../config/app_config.dart';
+import '../providers/auth_state_provider.dart';
+import '../../features/auth/presentation/auth_screen.dart';
+import '../../features/map/presentation/map_screen.dart';
+import '../../features/activities/presentation/activities_screen.dart';
+import '../../features/matching/presentation/matching_screen.dart';
+import '../../features/chat/presentation/chat_screen.dart';
 
 part 'app_router.g.dart';
 
-// Routes accessibles sans authentification
 const _routesPubliques = ['/auth', '/splash'];
 
-@riverpod
+@Riverpod(keepAlive: true)
 GoRouter appRouter(AppRouterRef ref) {
-  // TODO Sprint Auth : écouter authStateProvider pour conditionner le redirect
-  // final authState = ref.watch(authStateProvider);
+  // Guard actif dès Sprint 0 : authStateProvider retourne false (stub)
+  // → toutes les routes protégées redirigent vers /auth jusqu'au Sprint Auth
+  final isAuthenticated = ref.watch(authStateProvider);
 
   return GoRouter(
     initialLocation: '/splash',
-    debugLogDiagnostics: appEnv != 'prod',
+    debugLogDiagnostics: isDevelopment,
     redirect: (context, state) {
-      // Garde-fou : ce scaffold sans auth NE DOIT PAS être buildé en staging/prod
-      assert(appEnv == 'dev', 'Auth guard doit être activé avant tout build staging ou prod');
-
-      // Guard d'authentification — à activer lors du Sprint Auth
-      // final estAuthentifie = authState.isAuthenticated;
-      // final versRoutePublique = _routesPubliques.any(
-      //   (r) => state.matchedLocation.startsWith(r),
-      // );
-      // if (!estAuthentifie && !versRoutePublique) return '/auth';
-      // if (estAuthentifie && state.matchedLocation.startsWith('/auth')) return '/map';
+      final versRoutePublique = _routesPubliques.any(
+        (r) => state.matchedLocation.startsWith(r),
+      );
+      if (!isAuthenticated && !versRoutePublique) return '/auth';
+      if (isAuthenticated && state.matchedLocation.startsWith('/auth')) {
+        return '/map';
+      }
       return null;
     },
     routes: [
       GoRoute(
         path: '/splash',
-        builder: (context, state) => const _PlaceholderScreen(label: 'Splash'),
+        builder: (context, state) => const AuthScreen(),
       ),
       GoRoute(
         path: '/auth',
-        builder: (context, state) => const _PlaceholderScreen(label: 'Auth'),
+        builder: (context, state) => const AuthScreen(),
         routes: [
           GoRoute(
             path: 'phone',
-            builder: (context, state) =>
-                const _PlaceholderScreen(label: 'Auth — Téléphone'),
+            builder: (context, state) => const AuthPhoneScreen(),
           ),
           GoRoute(
             path: 'otp',
-            builder: (context, state) =>
-                const _PlaceholderScreen(label: 'Auth — OTP'),
+            builder: (context, state) => const AuthOtpScreen(),
           ),
         ],
       ),
       GoRoute(
         path: '/map',
-        builder: (context, state) => const _PlaceholderScreen(label: 'Carte'),
+        builder: (context, state) => const MapScreen(),
       ),
       GoRoute(
         path: '/activities',
-        builder: (context, state) =>
-            const _PlaceholderScreen(label: 'Activités'),
+        builder: (context, state) => const ActivitiesScreen(),
         routes: [
           // Routes statiques AVANT les routes dynamiques (règle GoRouter)
           GoRoute(
             path: 'create',
-            builder: (context, state) =>
-                const _PlaceholderScreen(label: 'Créer activité'),
+            builder: (context, state) => const CreateActivityScreen(),
           ),
           GoRoute(
             path: ':id',
-            builder: (context, state) =>
-                const _PlaceholderScreen(label: 'Détail activité'),
+            builder: (context, state) => ActivityDetailScreen(
+              activityId: state.pathParameters['id']!,
+            ),
           ),
         ],
       ),
       GoRoute(
         path: '/matching',
-        builder: (context, state) =>
-            const _PlaceholderScreen(label: 'Matching'),
+        builder: (context, state) => const MatchingScreen(),
       ),
       GoRoute(
         path: '/chat/:roomId',
-        builder: (context, state) => const _PlaceholderScreen(label: 'Chat'),
-      ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const _PlaceholderScreen(label: 'Profil'),
+        builder: (context, state) => ChatScreen(
+          roomId: state.pathParameters['roomId']!,
+        ),
       ),
     ],
   );
-}
-
-// ignore: unused_element
-const String appEnv = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
-
-class _PlaceholderScreen extends StatelessWidget {
-  final String label;
-  const _PlaceholderScreen({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(label)),
-      body: Center(child: Text(label)),
-    );
-  }
 }

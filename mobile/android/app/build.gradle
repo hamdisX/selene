@@ -1,0 +1,101 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+    // Sprint Notifications : décommenter après `flutterfire configure`
+    // id "com.google.gms.google-services"
+}
+
+// Lecture du keystore depuis key.properties (gitignored)
+def keystorePropertiesFile = rootProject.file('key.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace "com.selene.app"
+    compileSdk flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    signingConfigs {
+        // key.properties doit contenir : storeFile, storePassword, keyAlias, keyPassword
+        // Générer avec : keytool -genkey -v -keystore selene.jks -keyalg RSA -keysize 2048 -validity 10000 -alias selene
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.selene.app"
+        minSdk flutter.minSdkVersion
+        targetSdk flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
+    }
+
+    // ─── Flavors ────────────────────────────────────────────────────────────
+    // flutter run --flavor dev --dart-define=APP_ENV=dev --dart-define=MAP_DRIVER=maplibre
+    // flutter run --flavor staging --dart-define=APP_ENV=staging --dart-define=MAP_DRIVER=mapbox
+    // flutter build appbundle --flavor prod --dart-define=APP_ENV=prod
+    flavorDimensions "environment"
+
+    productFlavors {
+        dev {
+            dimension "environment"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+            resValue "string", "app_name", "Séléné Dev"
+        }
+        staging {
+            dimension "environment"
+            applicationIdSuffix ".staging"
+            versionNameSuffix "-staging"
+            resValue "string", "app_name", "Séléné Staging"
+        }
+        prod {
+            dimension "environment"
+            resValue "string", "app_name", "Séléné"
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            // Requiert key.properties — voir scripts/generate-android-keystore.sh
+            // Sans key.properties, le build release échoue intentionnellement
+            signingConfig keystorePropertiesFile.exists()
+                ? signingConfigs.release
+                : null
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+flutter {
+    source "../.."
+}
+
+dependencies {
+    // Sprint Notifications : décommenter après `flutterfire configure`
+    // implementation platform("com.google.firebase:firebase-bom:33.0.0")
+    // implementation "com.google.firebase:firebase-messaging"
+}

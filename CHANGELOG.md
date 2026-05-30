@@ -135,6 +135,58 @@
 
 ---
 
+## [2026-05-30] — Sprint 0 : Initialisation mobile Flutter
+
+### Ajouté — Mobile (Flutter 3.44.0)
+
+#### Configuration centrale
+- `mobile/lib/core/config/app_config.dart` — constantes dart-define (APP_ENV, MAP_DRIVER, BACKEND_URL), getters `isProduction` / `isDevelopment`
+- `mobile/lib/main.dart` — guard HTTPS au démarrage (StateError si !isDevelopment && !backendUrl.startsWith('https://'))
+
+#### Réseau
+- `mobile/lib/core/network/token_storage.dart` — JWT storage sécurisé (EncryptedSharedPreferences Android, KeychainAccessibility.first_unlock iOS)
+- `mobile/lib/core/network/auth_interceptor.dart` — injection Bearer, refresh automatique JWT avec `_refreshDio` séparé (évite boucle 401 récursive)
+- `mobile/lib/core/network/api_client.dart` — Dio, LogInterceptor sans tokens (requestHeader/Body:false), base URL `$backendUrl/api/v1`
+- `mobile/lib/core/network/network_providers.dart` — providers Riverpod `tokenStorageProvider` + `apiClientProvider`
+- `mobile/lib/core/network/network_providers.g.dart` — code généré
+
+#### Navigation
+- `mobile/lib/core/router/app_router.dart` — GoRouter, guard auth activé (`ref.watch(authStateProvider)`), routes statiques avant dynamiques, `@Riverpod(keepAlive: true)`
+- `mobile/lib/core/router/app_router.g.dart` — `Provider<GoRouter>.internal` (keepAlive, non AutoDispose)
+
+#### Auth state
+- `mobile/lib/core/providers/auth_state_provider.dart` — stub `@riverpod bool authState(...)` → false (actif Sprint Auth)
+- `mobile/lib/core/providers/auth_state_provider.g.dart` — code généré
+
+#### Écrans feature (stubs prêts Sprint 1+)
+- `mobile/lib/features/auth/presentation/auth_screen.dart` — AuthScreen, AuthPhoneScreen, AuthOtpScreen
+- `mobile/lib/features/map/presentation/map_screen.dart` — MapScreen avec MapService adapter
+- `mobile/lib/features/activities/presentation/activities_screen.dart` — ActivitiesScreen, CreateActivityScreen, ActivityDetailScreen
+- `mobile/lib/features/matching/presentation/matching_screen.dart` — MatchingScreen
+- `mobile/lib/features/chat/presentation/chat_screen.dart` — ChatScreen(roomId)
+
+#### Android
+- `mobile/android/app/build.gradle` — flavors (dev/staging/prod), signing via `key.properties` (build échoue intentionnellement sans keystore), minify + shrink release, ProGuard
+- `mobile/android/app/proguard-rules.pro` — règles Flutter, flutter_secure_storage, OkHttp/Kotlin coroutines
+
+#### Qualité
+- `mobile/analysis_options.yaml` — `flutter_lints`, règles cancel_subscriptions, close_sinks, unawaited_futures
+
+### Validé (Workflow F)
+- REVIEW_MOBILE_OK ✅ — Flutter, Riverpod, GoRouter, adapters carte
+- REVIEW_SECURITY_OK ✅ — JWT storage, LogInterceptor, guard HTTPS, signing APK, auth guard
+- **REVIEW_PRO_OK ✅** — Verdict : APPROUVÉ AVEC RÉSERVES MINEURES
+
+### Points de vigilance documentés (backlog Sprint 1+)
+- `/splash` et `/auth` pointent tous deux vers `AuthScreen` — créer un `SplashScreen` distinct avant Sprint Auth
+- Contrat `/auth/refresh` à documenter (snake_case `refresh_token`) dans TECHNICAL_DECISIONS.md avant Sprint Auth
+- `_isRefreshing bool` insuffisant pour requêtes 401 concurrentes — implémenter une queue au Sprint Auth
+- `createMapService()` à migrer en Riverpod Provider au Sprint Maps
+- Injection du keystore en CI/CD à documenter au Sprint CI/CD
+- Package `maplibre_gl` : à surveiller (maintenance communautaire) — fallback `flutter_map` documenté en option
+
+---
+
 <!-- TEMPLATE pour les prochaines entrées
 
 ## [YYYY-MM-DD] — Sprint N / Feature X

@@ -757,6 +757,8 @@ messages               (id, room_id, sender_id, content, created_at)
 | Monitoring DPA | Contrat Sentry EU + politique scrubbing PII | Avant beta |
 | @nestjs/swagger | ^11.0.0 — incompatible avec NestJS 11 si version antérieure | Résolu Sprint 0 |
 | @typescript-eslint | ^8.0.0 — ESLint 9 requiert typescript-eslint v8+ | Résolu Sprint 0 |
+| Flutter — connexion backend dev | IP locale machine requise sur iPhone physiqu(`BACKEND_URL=http://192.168.1.x:3000`) | À configurer Sprint 1 |
+
 
 > **Décisions déjà tranchées** (retirées de cette liste) : GoRouter (acté sections 2.2 et 7), stratégie background location (actée section 2.6).
 
