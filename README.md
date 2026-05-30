@@ -148,6 +148,71 @@ Résultat : `docs/selene-cdc-v4-final.md` — EXPERT_PRO_OK ✅
 
 ---
 
+## Démarrage sur une nouvelle machine
+
+### Prérequis
+- Docker + Docker Compose v2
+- Git
+- Ubuntu (pour le script de setup mobile)
+
+### 1. Cloner et configurer l'environnement mobile
+
+```bash
+git clone <url-du-repo> selene
+cd selene
+
+bash scripts/setup-mobile-env.sh   # Flutter 3.44.0 + Android SDK + Chromium
+source ~/.bashrc
+```
+
+### 2. Configurer les variables d'environnement
+
+```bash
+# Docker Compose (credentials, ports)
+cp .env.example .env
+# Éditer .env : DB_PASSWORD, REDIS_PASSWORD (min 16 car.), MINIO_ACCESS_KEY, MINIO_SECRET_KEY
+
+# NestJS backend (drivers, URLs internes)
+cp backend/.env.example backend/.env.local
+# Éditer backend/.env.local : mêmes DB_PASSWORD, REDIS_PASSWORD, MINIO_ACCESS_KEY, MINIO_SECRET_KEY
+```
+
+### 3. Générer les clés JWT
+
+```bash
+bash scripts/generate-jwt-keys.sh
+# Crée backend/keys/jwt_private.pem et jwt_public.pem
+```
+
+### 4. Démarrer les services
+
+```bash
+make up
+
+# Vérification
+make ps
+curl http://localhost:3000/api/v1/health   # → {"status":"ok"}
+```
+
+### 5. Lancer l'app Flutter
+
+```bash
+cd mobile
+
+# Émulateur Android
+flutter run --flavor dev --dart-define=APP_ENV=dev --dart-define=MAP_DRIVER=maplibre
+
+# iPhone physique (remplacer l'IP par celle de la machine de dev)
+flutter run --flavor dev \
+  --dart-define=APP_ENV=dev \
+  --dart-define=MAP_DRIVER=maplibre \
+  --dart-define=BACKEND_URL=http://192.168.x.x:3000
+```
+
+> Fichiers non versionnés à créer manuellement : `.env`, `backend/keys/`
+
+---
+
 ## Développement avec Claude Code
 
 ### Démarrage de session

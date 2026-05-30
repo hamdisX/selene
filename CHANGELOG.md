@@ -206,6 +206,13 @@
 
 ---
 
+## [2026-05-30] — Documentation : procédure de démarrage sur nouvelle machine
+
+### Modifié
+- `README.md` — ajout section "Démarrage sur une nouvelle machine" (5 étapes : setup mobile, `.env` + `backend/.env.local`, clés JWT, `make up`, `flutter run`)
+
+---
+
 ## [2026-05-30] — Sprint 0 : Script setup environnement mobile Ubuntu
 
 ### Ajouté
