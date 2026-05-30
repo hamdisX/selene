@@ -32,6 +32,8 @@ mobile/android/local.properties
 mobile/android/key.properties
 mobile/android/app/google-services.json
 mobile/android/app/release/
+mobile/android/build/
+mobile/android/app/build.gradle.kts
 
 # ─── iOS ──────────────────────────────────────────────────────────────────
 mobile/ios/Pods/
