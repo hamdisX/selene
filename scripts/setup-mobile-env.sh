@@ -77,7 +77,7 @@ verifier_dependances() {
     etape "Vérification des dépendances système"
 
     local manquants=()
-    for pkg in curl wget unzip tar xz-utils git openjdk-17-jdk; do
+    for pkg in curl wget unzip tar xz-utils git openjdk-17-jdk openjdk-21-jdk; do
         if ! dpkg -l "$pkg" &>/dev/null 2>&1; then
             manquants+=("$pkg")
         fi

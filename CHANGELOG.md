@@ -213,6 +213,40 @@
 
 ---
 
+## [2026-05-30] — Corrections Android Gradle (nouvelle machine Ubuntu)
+
+### Contexte
+Erreurs détectées après clonage du repo sur une nouvelle machine Ubuntu + `flutter create` regénère des fichiers Android absents du repo.
+
+### Problèmes corrigés
+
+1. **Double `build.gradle` / `build.gradle.kts`** — `flutter create` regénère un `app/build.gradle.kts` (Kotlin DSL, namespace `com.selene.selene`, sans flavors) qui coexistait avec le `app/build.gradle` Groovy commité. Gradle refuse les deux.
+   → `mobile/android/app/build.gradle.kts` supprimé. Seul le Groovy reste.
+
+2. **`resValue` "custom resource values feature disabled"** — AGP 8/9 désactive la feature `resValues` par défaut dans les `productFlavors`.
+   → `buildFeatures { resValues true }` ajouté dans `android {}` de `build.gradle`.
+
+3. **Namespace `com.selene.app` vs `MainActivity.kt` généré en `com.selene.selene`** — La manifest résout `.MainActivity` relatif au `namespace` ; le fichier Kotlin auto-généré est dans `com.selene.selene`, non commité.
+   → `namespace` aligné sur `com.selene.selene` dans `build.gradle`. `applicationId` reste `com.selene.app`.
+
+4. **JDK 21 absent (JRE seulement)** — `maplibre_gl` et `firebase_core` requièrent le compilateur Java 21. Cache Gradle purgé (`~/.gradle/caches/9.1.0/jvms/`) après installation de `openjdk-21-jdk`.
+   → `openjdk-21-jdk` ajouté dans `scripts/setup-mobile-env.sh`.
+
+### Fichiers modifiés
+- `mobile/android/app/build.gradle` — namespace `com.selene.selene`, `buildFeatures { resValues true }`
+- `mobile/android/app/build.gradle.kts` — supprimé
+- `scripts/setup-mobile-env.sh` — `openjdk-21-jdk` ajouté aux dépendances système
+
+### Validé
+- `flutter build apk --flavor dev --debug` ✅ — `app-dev-debug.apk` généré
+- APK installé et lancé sur Motorola moto g54 5G (ZY22K8WCVK) ✅
+
+### Points de vigilance documentés
+- `build.gradle.kts` est regénéré par `flutter create` à chaque init machine — ne pas le commiter, le supprimer à chaque fois (ou l'ajouter au `.gitignore`)
+- Warnings KGP (`image_picker_android`, `mapbox_maps_flutter`, `maplibre_gl`) : ces plugins appliquent encore `kotlin-android` à l'ancienne — pas bloquant aujourd'hui, à surveiller lors des upgrades Flutter
+
+---
+
 ## [2026-05-30] — Sprint 0 : Script setup environnement mobile Ubuntu
 
 ### Ajouté
