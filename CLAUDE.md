@@ -227,7 +227,7 @@ Ne jamais passer à la phase suivante sans tous les OK simultanés.
 |----------|---------|--------|
 | Cahier des charges | `docs/selene-cdc-v4-final.md` | ✅ EXPERT_PRO_OK |
 | Décisions techniques | `docs/TECHNICAL_DECISIONS.md` | ✅ EXPERT_PRO_OK |
-| Sprint 0 — Setup environnement | `backend/` + `mobile/` + `docker-compose.yml` | ✅ REVIEW_PRO_OK |
+| Sprint 0 — Validation environnement | tous services | ✅ REVIEW_PRO_OK |
 
 
 ---
