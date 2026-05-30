@@ -1,0 +1,23 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": ["ts-jest", {
+      "tsconfig": "<rootDir>/../tsconfig.json"
+    }]
+  },
+  "moduleNameMapper": {
+    "^@auth/(.*)$": "<rootDir>/../src/auth/$1",
+    "^@users/(.*)$": "<rootDir>/../src/users/$1",
+    "^@activities/(.*)$": "<rootDir>/../src/activities/$1",
+    "^@matching/(.*)$": "<rootDir>/../src/matching/$1",
+    "^@chat/(.*)$": "<rootDir>/../src/chat/$1",
+    "^@notifications/(.*)$": "<rootDir>/../src/notifications/$1",
+    "^@geo/(.*)$": "<rootDir>/../src/geo/$1",
+    "^@moderation/(.*)$": "<rootDir>/../src/moderation/$1",
+    "^@adapters/(.*)$": "<rootDir>/../src/adapters/$1",
+    "^@config/(.*)$": "<rootDir>/../src/config/$1"
+  }
+}
