@@ -206,6 +206,29 @@
 
 ---
 
+## [2026-05-30] — Sprint 0 : Script setup environnement mobile Ubuntu
+
+### Ajouté
+- `scripts/setup-mobile-env.sh` — script idempotent de configuration de l'environnement de développement mobile Flutter sur Ubuntu natif (pas WSL2)
+  - Flutter 3.44.0 — téléchargement, extraction, vérification de version existante
+  - Android SDK — cmdline-tools, platform-tools, android-36, build-tools 36.0.0
+  - Licences Android — acceptation automatique via `yes | sdkmanager --licenses`
+  - Chromium — installation si absent (requis pour `flutter build web`)
+  - `CHROME_EXECUTABLE` — détection automatique et ajout dans `~/.bashrc`
+  - Variables d'environnement — bloc délimité `# >>> Séléné mobile env >>>` dans `~/.bashrc`
+  - Résumé final avec rappel `source ~/.bashrc`
+
+### Validé (Workflow F)
+- REVIEW_INFRA_OK ✅ — structure bash, idempotence, ordre des étapes, chemins Ubuntu
+- REVIEW_SECURITY_OK ✅ — pas de secrets, sudo minimal, HTTPS, pas d'injection
+- **REVIEW_PRO_OK ✅** — Verdict : APPROUVÉ AVEC RÉSERVES MINEURES
+
+### Points de vigilance documentés
+- `CMDLINE_TOOLS_URL` encode un build ID Google fixe (`11076708`) — à mettre à jour si Google modifie l'URL de distribution des cmdline-tools
+- Archives téléchargées conservées dans `/tmp` — pas de nettoyage automatique (acceptable pour un script de setup dev)
+
+---
+
 <!-- TEMPLATE pour les prochaines entrées
 
 ## [YYYY-MM-DD] — Sprint N / Feature X
