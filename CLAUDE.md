@@ -232,6 +232,25 @@ Ne jamais passer à la phase suivante sans tous les OK simultanés.
 
 ---
 
+## Règle de fin de workflow
+
+Une fois tous les OK obtenus (REVIEW_PRO_OK ou EXPERT_PRO_OK) :
+
+1. Mettre à jour CHANGELOG.md avec :
+   - La date du jour
+   - Le nom du sprint / feature
+   - Les fichiers créés ou modifiés
+   - Les agents qui ont validé + leur OK
+   - Les points de vigilance documentés
+
+2. Commit git avec message conventionnel :
+   - `feat:` nouvelle feature
+   - `docs:` documentation
+   - `chore:` setup, config
+   - `fix:` correction
+
+---
+
 ## Langue
 Tout le code, les commentaires et la documentation sont en français.
 Les agents communiquent en français.
