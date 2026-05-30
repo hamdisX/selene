@@ -187,6 +187,25 @@
 
 ---
 
+## [2026-05-30] — Sprint 0 : Configuration toolchain Flutter
+
+### Ajouté / Corrigé
+
+- **Plateforme web activée** — `flutter create . --platforms=web,android,ios` dans `mobile/` (génère `web/`, `.idea/`, `selene.iml`)
+- **Android SDK configuré** — android-35, android-36, build-tools installés et licences acceptées (`flutter doctor` ✅)
+- **`pubspec.yaml`** — correction nom package : `flutter_maplibre_gl` → `maplibre_gl ^0.26.0` (0.20.0 incompatible avec Flutter 3.44 sur web — `platformViewRegistry` déplacé dans `dart:ui_web`)
+- **`pubspec.yaml`** — fonts Inter commentées (fichiers absents, à réintégrer au Sprint UI)
+- **`main.dart`** — `fontFamily: 'Inter'` commenté en attendant Sprint UI
+- **`auth_screen.dart`** — bouton "Continuer avec mon numéro" route vers `/auth/phone` via `context.go()`
+
+### Validé
+- `flutter doctor` ✅ — toolchain Flutter 3.44.0 opérationnel
+- `flutter pub get` ✅ — 178 dépendances résolues
+- `flutter build web` ✅ — compilation web sans erreur
+- App accessible sur http://localhost:8080 — auth guard actif, routing `/auth` → `/auth/phone` fonctionnel
+
+---
+
 <!-- TEMPLATE pour les prochaines entrées
 
 ## [YYYY-MM-DD] — Sprint N / Feature X
