@@ -231,6 +231,8 @@ Ne jamais passer à la phase suivante sans tous les OK simultanés.
 | Décisions techniques | `docs/TECHNICAL_DECISIONS.md` | ✅ EXPERT_PRO_OK |
 | Sprint 0 — Validation environnement | tous services | ✅ REVIEW_PRO_OK |
 | Sprint 0 — Init mobile Flutter | `mobile/` | ✅ REVIEW_PRO_OK |
+| Script setup-mobile-env.sh | `scripts/setup-mobile-env.sh` | ✅ REVIEW_PRO_OK |
+
 
 
 
