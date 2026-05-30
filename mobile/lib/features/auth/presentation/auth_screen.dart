@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AuthScreen extends StatelessWidget {
   const AuthScreen({super.key});
@@ -26,7 +27,7 @@ class AuthScreen extends StatelessWidget {
               const SizedBox(height: 48),
               // Placeholder — Sprint Auth remplacera par le formulaire téléphone + OTP
               FilledButton(
-                onPressed: () {},
+                onPressed: () => context.go('/auth/phone'),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                 ),

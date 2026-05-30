@@ -47,7 +47,9 @@ iOS + Android (Flutter).
 - Containerisation : Docker Compose (backend + DB + Redis + MinIO + OSRM)
 - Flutter tourne en dehors de Docker
 - Node.js : 24 LTS
-- Flutter : 3.44.0 (Impeller engine, null safety strict)
+- Flutter : 3.44.0 — chemin complet : `/home/hmiled/flutter/bin/flutter`
+- Flutter PATH non chargé automatiquement dans Claude Code → utiliser chemin absolu
+
 
 ## Principe architectural central — Pattern Adapter
 Changer de service = modifier 1 variable `.env`. Zéro changement code métier.
@@ -228,6 +230,8 @@ Ne jamais passer à la phase suivante sans tous les OK simultanés.
 | Cahier des charges | `docs/selene-cdc-v4-final.md` | ✅ EXPERT_PRO_OK |
 | Décisions techniques | `docs/TECHNICAL_DECISIONS.md` | ✅ EXPERT_PRO_OK |
 | Sprint 0 — Validation environnement | tous services | ✅ REVIEW_PRO_OK |
+| Sprint 0 — Init mobile Flutter | `mobile/` | ✅ REVIEW_PRO_OK |
+
 
 
 ---

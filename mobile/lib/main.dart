@@ -37,7 +37,7 @@ class SeleneApp extends ConsumerWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2D6A4F)),
         useMaterial3: true,
-        fontFamily: 'Inter',
+        // fontFamily: 'Inter', — à activer au Sprint UI après ajout des fonts
       ),
       routerConfig: router,
     );

@@ -28,7 +28,7 @@ dependencies:
   socket_io_client: ^2.0.3
 
   # Cartes — MapLibre (gratuit, OpenStreetMap)
-  flutter_maplibre_gl: ^0.20.0
+  maplibre_gl: ^0.26.0
 
   # Cartes — Mapbox (50K loads/mois gratuit)
   mapbox_maps_flutter: ^2.0.0
@@ -75,13 +75,14 @@ flutter:
     - assets/images/
     - assets/icons/
 
-  fonts:
-    - family: Inter
-      fonts:
-        - asset: assets/fonts/Inter-Regular.ttf
-        - asset: assets/fonts/Inter-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Inter-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Inter-Bold.ttf
-          weight: 700
+  # fonts Inter à ajouter au Sprint UI (télécharger depuis fonts.google.com/specimen/Inter)
+  # fonts:
+  #   - family: Inter
+  #     fonts:
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #       - asset: assets/fonts/Inter-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Inter-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Inter-Bold.ttf
+  #         weight: 700
