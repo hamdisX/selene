@@ -13,6 +13,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { GeoModule } from './geo/geo.module';
 import { ModerationModule } from './moderation/moderation.module';
 import { AdaptersModule } from './adapters/adapters.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { AdaptersModule } from './adapters/adapters.module';
     GeoModule,
     ModerationModule,
   ],
+  controllers: [HealthController],
   providers: [
     // Rate limiting actif sur tous les endpoints — à surcharger par @Throttle() sur les routes sensibles
     {

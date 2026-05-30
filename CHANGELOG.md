@@ -79,6 +79,62 @@
 
 ---
 
+## [2026-05-30] — Sprint 0 : Tests de validation environnement
+
+### Résultats des tests
+
+| Service | Image | Status | Healthcheck |
+|---------|-------|--------|-------------|
+| PostgreSQL + PostGIS | postgis/postgis:18-3.6 | ✅ Up | ✅ healthy |
+| Redis | redis:8.6.3-alpine | ✅ Up | ✅ healthy |
+| MinIO | minio/minio:latest | ✅ Up | ✅ healthy |
+| Backend NestJS | selene-backend | ✅ Up | ✅ démarré |
+
+#### Connexions validées
+- PostgreSQL 18.4 + PostGIS 3.6 : `SELECT version()` → OK ✅
+- PostgreSQL rôles init : `selene_app`, `selene_migrate`, `selene_readonly` créés ✅
+- Redis : `PING` → `PONG` ✅
+- TypeORM → PostgreSQL : `TypeOrmCoreModule dependencies initialized` ✅
+- MinIO bucket `selene-dev` : healthcheck live → 200 ✅
+
+#### Endpoints NestJS validés
+- `GET /api/v1/health` → 200 `{"status":"ok","timestamp":"..."}` ✅
+- `GET /api/docs` (Swagger UI) → 200 ✅
+
+### Corrections appliquées lors de la validation
+
+1. **`docker-compose.yml`** — volume PostgreSQL 18 : mount corrigé `/var/lib/postgresql/data` → `/var/lib/postgresql` (format PostgreSQL 18+)
+2. **`backend/Dockerfile`** — ajout `ENV npm_config_nodedir=/usr/local` pour éviter le téléchargement des headers Node par bcrypt/node-gyp
+3. **`backend/package.json`** — 3 corrections de versions :
+   - `@nestjs/swagger`: `^8.0.0` → `^11.0.0` (NestJS 11 incompatible avec swagger 8)
+   - `@typescript-eslint/eslint-plugin`: `^7.0.0` → `^8.0.0` (ESLint 9 requiert typescript-eslint 8)
+   - `@typescript-eslint/parser`: `^7.0.0` → `^8.0.0` (même raison)
+   - Ajout de `@fastify/static: "^8.0.0"` (requis par Fastify + Swagger pour servir les assets UI)
+4. **`backend/package-lock.json`** — généré (absent du repo initial)
+5. **`backend/src/adapters/`** — 10 fichiers d'adapters créés (squelettes Sprint 0) :
+   - `storage/minio.adapter.ts` — MinIOAdapter (implémentation complète dev)
+   - `storage/r2.adapter.ts` — CloudflareR2Adapter (implémentation complète prod)
+   - `otp/mock.adapter.ts` — MockOtpAdapter ✅
+   - `otp/twilio.adapter.ts` — TwilioOtpAdapter (prod)
+   - `push/mock.adapter.ts` — MockPushAdapter ✅
+   - `push/fcm-apns.adapter.ts` — FcmApnsAdapter (stub prod)
+   - `moderation/mock.adapter.ts` — MockModerationAdapter ✅
+   - `moderation/openai.adapter.ts` — OpenAIModerationAdapter (stub prod)
+   - `isochrone/osrm.adapter.ts` — OsrmIsochroneAdapter ✅
+   - `isochrone/mapbox.adapter.ts` — MapboxIsochroneAdapter (stub prod)
+6. **`backend/src/health.controller.ts`** — créé (GET /api/v1/health)
+7. **`backend/src/app.module.ts`** — ajout HealthController
+8. **`.env`** + **`backend/.env.local`** — créés (générés automatiquement, non commités)
+9. **`backend/keys/`** — clés JWT RSA 4096 générées via `scripts/generate-jwt-keys.sh`
+
+### Points de vigilance documentés
+
+- `selene_app` = rôle PostgreSQL SUPERUSER en dev (POSTGRES_USER Docker) — en prod, créer un rôle dédié avec permissions limitées uniquement
+- `osrm` non démarré (profil `routing`, données carte non préparées) — prévu Sprint 1 ou démarrer avec `make up-routing` après `make setup-osrm`
+- `@fastify/static` : dépendance obligatoire pour Swagger + Fastify, absente du `package.json` initial
+
+---
+
 <!-- TEMPLATE pour les prochaines entrées
 
 ## [YYYY-MM-DD] — Sprint N / Feature X

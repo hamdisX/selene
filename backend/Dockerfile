@@ -1,5 +1,7 @@
 FROM node:24-alpine AS base
 WORKDIR /app
+# npm_config_nodedir évite que node-gyp télécharge les headers Node depuis internet
+ENV npm_config_nodedir=/usr/local
 RUN apk add --no-cache python3 make g++ openssl
 
 # ─── Développement (hot-reload) ───────────────────────────────────────────
