@@ -26,7 +26,7 @@ iOS + Android (Flutter).
 |--------|-------------|-------|
 | Mobile | Flutter 3.44.0 (Dart) | iOS + Android |
 | Backend | NestJS + Fastify adapter | TypeScript |
-| Base de données | PostgreSQL 18.4 + 3.6.3 | Une seule DB partagée |
+| Base de données | PostgreSQL 18.4 + PostGIS 3.6.3 | Une seule DB partagée |
 | Cache / Pub-Sub | Redis 8.6.3 | Sessions, rate limiting |
 | Temps réel | Socket.io (NestJS Gateway) | Chat + carte live |
 | Stockage (dev) | MinIO (Docker) | Compatible S3 |
@@ -92,22 +92,20 @@ ROUTING_DRIVER=osrm|mapbox
 selene/
 ├── .claude/
 │   └── agents/
-│       ├── cdc/               # Agents review documents produit
-│       │   ├── architect-tech-1.md
-│       │   ├── architect-tech-2.md
-│       │   ├── expert-ux.md
-│       │   ├── expert-business.md
-│       │   ├── expert-security.md
-│       │   └── expert-pro.md
-│       └── dev/               # Agents review code
-│           ├── review-backend.md
-│           ├── review-mobile.md
-│           ├── review-database.md
-│           ├── review-infra.md
-│           ├── review-security.md
-│           ├── review-test.md
-│           ├── review-api.md
-│           └── review-pro.md
+│       │── architect-tech-1.md
+│       │── architect-tech-2.md
+│       │── expert-ux.md
+│       │── expert-business.md
+│       │── expert-security.md
+│       │── expert-pro.md
+│       │── review-backend.md
+│       │── review-mobile.md
+│       │── review-database.md
+│       │── review-infra.md
+│       │── review-security.md
+│       │── review-test.md
+│       │── review-api.md
+│       └── review-pro.md
 ├── backend/                   # NestJS + Fastify
 ├── mobile/                    # Flutter 3.44.0
 ├── docs/
@@ -122,7 +120,7 @@ selene/
 
 ## Agents disponibles
 
-### Agents CDC — `.claude/agents/cdc/`
+### Agents CDC — `.claude/agents/`
 Utilisés pour reviewer des **documents produit**.
 
 | Agent | Spécialité | Condition |
@@ -134,7 +132,7 @@ Utilisés pour reviewer des **documents produit**.
 | `expert-security` | RGPD, modération, anti-fake | `EXPERT_SECURITY_OK ✅` |
 | `expert-pro` | Validation finale globale document | `EXPERT_PRO_OK ✅` |
 
-### Agents Dev — `.claude/agents/dev/`
+### Agents Dev — `.claude/agents/`
 Utilisés pour reviewer du **code**.
 
 | Agent | Spécialité | Condition |
@@ -229,6 +227,8 @@ Ne jamais passer à la phase suivante sans tous les OK simultanés.
 |----------|---------|--------|
 | Cahier des charges | `docs/selene-cdc-v4-final.md` | ✅ EXPERT_PRO_OK |
 | Décisions techniques | `docs/TECHNICAL_DECISIONS.md` | ✅ EXPERT_PRO_OK |
+| Sprint 0 — Setup environnement | `backend/` + `mobile/` + `docker-compose.yml` | ✅ REVIEW_PRO_OK |
+
 
 ---
 
