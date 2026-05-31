@@ -232,6 +232,8 @@ Ne jamais passer à la phase suivante sans tous les OK simultanés.
 | Sprint 0 — Validation environnement | tous services | ✅ REVIEW_PRO_OK |
 | Sprint 0 — Init mobile Flutter | `mobile/` | ✅ REVIEW_PRO_OK |
 | Script setup-mobile-env.sh | `scripts/setup-mobile-env.sh` | ✅ REVIEW_PRO_OK |
+| Sprint 1 — Module Auth | `backend/src/auth/` + `mobile/lib/features/auth/` | ✅ REVIEW_PRO_OK |
+
 
 
 
